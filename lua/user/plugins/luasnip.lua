@@ -32,26 +32,28 @@ return {
 			end
 		end
 
-		function M.unload_package(package_name)
+		function M.reload_package(package_name)
 			for module_name, _ in pairs(package.loaded) do
 				if string.find(module_name, '^' .. package_name) then
 					package.loaded[module_name] = nil
+					require(module_name)
 				end
 			end
 		end
 
 		function M.refresh_snippets()
-			M.unload_package('user.snips')
 			ls.cleanup()
+			M.reload_package('user.snips')
 		end
 
 		local set = vim.keymap.set
 
 		local mode = { 'i', 's' }
+		local normal = { 'n' }
 
 		set(mode, '<c-i>', M.expand_or_jump)
 		set(mode, '<c-n>', M.jump_prev)
 		set(mode, '<c-l>', M.change_choice)
-		set(mode, ',r', M.refresh_snippets)
+		set(normal, ',r', M.refresh_snippets)
 	end
 }
